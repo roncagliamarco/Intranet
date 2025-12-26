@@ -1,1 +1,43 @@
-Readme
+# Portale Intranet Python (Django)
+
+Re-implementazione con Django del portale intranet: autenticazione LDAP, menu laterale letto da Oracle, Kanban drag & drop, planner per shift date e workflow VisionFlow-like.
+
+## Requisiti
+- Python 3.11+
+- Librerie opzionali: `ldap3` per LDAP, `cx_Oracle` per Oracle (solo se vuoi connetterti davvero)
+
+## Setup
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate  # database locale per le sessioni
+```
+
+## Variabili ambiente
+```bash
+SECRET_KEY=change-me
+DEBUG=true
+LDAP_SERVER=ldap://ldap.example.com
+LDAP_BASE_DN=dc=example,dc=com
+LDAP_USER_DN=ou=users
+LDAP_BIND_DN=cn=service,dc=example,dc=com
+LDAP_BIND_PASSWORD=***
+ORACLE_DSN=//dbhost:1521/ORCLPDB1
+ORACLE_USERNAME=intranet
+ORACLE_PASSWORD=***
+```
+
+Se LDAP non è configurato, il backend esegue un fallback demo che consente l'accesso con qualsiasi credenziale (solo per sviluppo).
+
+## Esecuzione
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+Apri http://localhost:8000 e accedi. Dopo il login trovi:
+- menu laterale dinamico da tabella Oracle (con fallback demo)
+- board Kanban con drag & drop che invia update a `/api/kanban/move`
+- planner con pulsanti +/- giorno che chiamano `/api/planner/shift`
+- pannello workflow con avanzamento step verso `/api/workflow/advance`
+
+Le chiamate API usano `cx_Oracle` solo se `ORACLE_DSN` è definito, altrimenti operano in memoria.

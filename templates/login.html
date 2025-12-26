@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-card">
+  <h1>Accesso Intranet</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">{{ form.username.label_tag }} {{ form.username }}</div>
+    <div class="field">{{ form.password.label_tag }} {{ form.password }}</div>
+    <button type="submit">Entra</button>
+  </form>
+  <div class="messages">
+    {% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}
+  </div>
+  <p class="hint">LDAP: {{ settings.LDAP_CONFIG.SERVER|default:'non configurato' }}</p>
+</div>
+{% endblock %}

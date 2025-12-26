@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<section id="dashboard">
+  <h1>Portale Intranet</h1>
+  <p>Autenticazione LDAP, menu dinamico da Oracle, e componenti Kanban/Planner/Workflow collegati a Oracle/VisionFlow.</p>
+</section>
+
+<section id="kanban" class="panel">
+  <div class="panel-header">
+    <h2>Kanban</h2>
+    <p>Trascina le card tra le colonne. Ogni drop invia l'aggiornamento a Oracle.</p>
+  </div>
+  <div class="kanban-grid">
+    {% for col in kanban_columns %}
+    <div class="kanban-column" data-status="{{ col }}">
+      <div class="kanban-column-title">{{ col }}</div>
+      <div class="kanban-cards">
+        {% for card in kanban_cards %}
+          {% if card.status == col %}
+          <div class="kanban-card" draggable="true" data-card-id="{{ card.id }}">
+            <div class="card-id">{{ card.id }}</div>
+            <div class="card-title">{{ card.title }}</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="planner" class="panel">
+  <div class="panel-header">
+    <h2>Planner</h2>
+    <p>Shifta le scadenze e invia l'aggiornamento ad Oracle.</p>
+  </div>
+  <div class="planner-list">
+    {% for item in planner_items %}
+    <div class="planner-item" data-task-id="{{ item.id }}">
+      <div>
+        <strong>{{ item.title }}</strong>
+        <div class="muted">Scadenza: {{ item.due_date }}</div>
+      </div>
+      <div class="planner-actions">
+        <button class="shift" data-delta="-1">-1 giorno</button>
+        <button class="shift" data-delta="1">+1 giorno</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="workflow" class="panel">
+  <div class="panel-header">
+    <h2>Workflow (VisionFlow-like)</h2>
+    <p>Progredisci lo step del workflow con API collegate al motore di workflow.</p>
+  </div>
+  <div class="workflow-list">
+    {% for wf in workflow_instances %}
+    <div class="workflow-item" data-instance-id="{{ wf.id }}">
+      <div>
+        <strong>{{ wf.name }}</strong>
+        <div class="muted">Step attuale: {{ wf.step }}</div>
+      </div>
+      <input type="text" class="next-step" placeholder="Nuovo step" aria-label="Nuovo step">
+      <button class="advance">Avanza</button>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

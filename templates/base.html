@@ -1,0 +1,44 @@
+{% load static %}
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Intranet</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Intranet</div>
+    {% if user.is_authenticated %}
+    <div class="user">{{ user.username }} · <a href="{% url 'logout' %}">Logout</a></div>
+    {% endif %}
+  </header>
+  <div class="layout">
+    {% if user.is_authenticated %}
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          {% for entry in menu %}
+            <li>
+              <a href="{{ entry.path|default:'#' }}">{{ entry.label }}</a>
+              {% if entry.children %}
+              <ul>
+                {% for child in entry.children %}
+                <li><a href="{{ child.path|default:'#' }}">{{ child.label }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+    {% endif %}
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
