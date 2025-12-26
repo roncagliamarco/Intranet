@@ -1,22 +1,23 @@
-# Portale Intranet Python
+# Portale Intranet Python (Django)
 
-Prototipo di portale intranet con autenticazione LDAP, menu dinamico da Oracle e componenti Kanban/Planner/Workflow.
+Re-implementazione con Django del portale intranet: autenticazione LDAP, menu laterale letto da Oracle, Kanban drag & drop, planner per shift date e workflow VisionFlow-like.
 
 ## Requisiti
 - Python 3.11+
-- Oracle client libraries per `cx_Oracle`
-- Server LDAP raggiungibile
+- Librerie opzionali: `ldap3` per LDAP, `cx_Oracle` per Oracle (solo se vuoi connetterti davvero)
 
-Installa le dipendenze:
-```
+## Setup
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+python manage.py migrate  # database locale per le sessioni
 ```
 
-Configura le variabili ambiente (puoi usare un file `.env`):
-```
+## Variabili ambiente
+```bash
 SECRET_KEY=change-me
+DEBUG=true
 LDAP_SERVER=ldap://ldap.example.com
 LDAP_BASE_DN=dc=example,dc=com
 LDAP_USER_DN=ou=users
@@ -27,18 +28,16 @@ ORACLE_USERNAME=intranet
 ORACLE_PASSWORD=***
 ```
 
-Esegui l'app Flask:
-```
-export FLASK_APP=app
-export FLASK_ENV=development
-flask run --debug
-```
+Se LDAP non è configurato, il backend esegue un fallback demo che consente l'accesso con qualsiasi credenziale (solo per sviluppo).
 
-## Caratteristiche
-- **Autenticazione LDAP** con `ldap3` e `flask-login`.
-- **Menu laterale** recuperato da tabella Oracle `INTRANET_MENU` (fallback demo se DSN non impostato).
-- **Kanban drag & drop** con API `/api/kanban/move` che aggiorna Oracle (`INTRANET_TASK`).
-- **Planner** con azioni di shift date (+/- giorni) via `/api/planner/shift` che persiste su `INTRANET_PLANNER`.
-- **Workflow VisionFlow-like** con step aggiornabili via `/api/workflow/advance` che scrive su `INTRANET_WORKFLOW`.
+## Esecuzione
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+Apri http://localhost:8000 e accedi. Dopo il login trovi:
+- menu laterale dinamico da tabella Oracle (con fallback demo)
+- board Kanban con drag & drop che invia update a `/api/kanban/move`
+- planner con pulsanti +/- giorno che chiamano `/api/planner/shift`
+- pannello workflow con avanzamento step verso `/api/workflow/advance`
 
-Le sezioni usano dati demo se le credenziali Oracle non sono presenti, facilitando lo sviluppo offline.
+Le chiamate API usano `cx_Oracle` solo se `ORACLE_DSN` è definito, altrimenti operano in memoria.
