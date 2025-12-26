@@ -1,1 +1,44 @@
-Readme
+# Portale Intranet Python
+
+Prototipo di portale intranet con autenticazione LDAP, menu dinamico da Oracle e componenti Kanban/Planner/Workflow.
+
+## Requisiti
+- Python 3.11+
+- Oracle client libraries per `cx_Oracle`
+- Server LDAP raggiungibile
+
+Installa le dipendenze:
+```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Configura le variabili ambiente (puoi usare un file `.env`):
+```
+SECRET_KEY=change-me
+LDAP_SERVER=ldap://ldap.example.com
+LDAP_BASE_DN=dc=example,dc=com
+LDAP_USER_DN=ou=users
+LDAP_BIND_DN=cn=service,dc=example,dc=com
+LDAP_BIND_PASSWORD=***
+ORACLE_DSN=//dbhost:1521/ORCLPDB1
+ORACLE_USERNAME=intranet
+ORACLE_PASSWORD=***
+```
+
+Esegui l'app Flask:
+```
+export FLASK_APP=app
+export FLASK_ENV=development
+flask run --debug
+```
+
+## Caratteristiche
+- **Autenticazione LDAP** con `ldap3` e `flask-login`.
+- **Menu laterale** recuperato da tabella Oracle `INTRANET_MENU` (fallback demo se DSN non impostato).
+- **Kanban drag & drop** con API `/api/kanban/move` che aggiorna Oracle (`INTRANET_TASK`).
+- **Planner** con azioni di shift date (+/- giorni) via `/api/planner/shift` che persiste su `INTRANET_PLANNER`.
+- **Workflow VisionFlow-like** con step aggiornabili via `/api/workflow/advance` che scrive su `INTRANET_WORKFLOW`.
+
+Le sezioni usano dati demo se le credenziali Oracle non sono presenti, facilitando lo sviluppo offline.
